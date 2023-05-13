@@ -1,8 +1,11 @@
 package tracer;
 
 import java.lang.instrument.Instrumentation;
+import java.util.HashMap;
 
 public class Agent {
+    static HashMap<String, Integer> call_count = new HashMap<>();
+
     public static void premain(final String agentArgs, final Instrumentation inst) {
         Runtime.getRuntime().addShutdownHook(new Thread(Agent::onShutDown));
 
@@ -31,7 +34,12 @@ public class Agent {
         System.err.printf("method,%d,%d,%s\n", methodId, classId, methodName);
     }
 
-    public static void onEntry(final int methodId, final Object context, final Object[] arguments) {
+    public static void onEntry(final int methodId, final String methodName, final Object context, final Object[] arguments) {
+        if (!call_count.containsKey(methodName)) {
+            call_count.put(methodName, 1);
+        } else {
+            call_count.put(methodName, call_count.get(methodName) + 1);
+        }
         System.err.printf("enter,%d\n", methodId);
     }
 
@@ -40,6 +48,7 @@ public class Agent {
     }
 
     public static void onShutDown() {
+        for(String methodName: call_count.keySet()) System.err.printf("name: %s, called: %d\n", methodName, call_count.get(methodName));
         System.err.println("shutdown");
     }
 }

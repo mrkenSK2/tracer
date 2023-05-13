@@ -49,7 +49,7 @@ public class Transformer implements ClassFileTransformer {
                     Agent.onInstrumentMethod(classId, methodId, behavior.getLongName());
 
                     final String recv = ((behavior instanceof CtMethod) && !Modifier.isStatic(behavior.getModifiers())) ? "$0" : "null";
-                    behavior.insertBefore(String.format("tracer.Agent.onEntry(%d, %s, $args);", methodId, recv));
+                    behavior.insertBefore(String.format("tracer.Agent.onEntry(%d, \"%s\", %s, $args);", methodId, behavior.getLongName(), recv));
                     behavior.insertAfter(String.format("tracer.Agent.onExit(%d, ($w)$_);", methodId));
                     touched = true;
                 }
