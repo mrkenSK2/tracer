@@ -3,6 +3,9 @@ package tracer;
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Agent {
     private static class FuncInfo {
@@ -106,12 +109,32 @@ public class Agent {
     public static void onExit(final int methodId, final Object returnValue) {
         System.err.printf("exit,%d\n", methodId);
     }
+    
+    private static void createDot() {
+        File dir = new File("build");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        try{
+            File file = new File("build/callGraph.dot");
+            FileWriter filewriter = new FileWriter(file);
+            filewriter.write("strict digraph G {\n");
+            for (CallRel callRel : callRelList) {
+                if (callRel.caller.name == "callRoot") continue;
+                String content = "    \"" + callRel.caller.name + "\" -> \"" + callRel.callee.name + 
+                "\" [label=" + callRel.count + "]\n";
+                filewriter.write(content);
+            }
+            filewriter.write("}\n");
+            filewriter.close();
+        }catch(IOException e){
+            System.out.println(e);
+        }
+    }
 
     public static void onShutDown() {
         for(String methodName: call_count.keySet()) System.err.printf("name: %s, called: %d\n", methodName, call_count.get(methodName));
-        for (CallRel callrel: callRelList) {
-            System.err.println(callrel.caller.name + " " + callrel.callee.name + " " + callrel.count);
-        }
+        createDot();
         System.err.println("shutdown");
     }
 }
