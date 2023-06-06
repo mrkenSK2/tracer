@@ -1,1 +1,17 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/1wpe1qvA)
+# tracer
+## X4-1
+基礎課題に続く形でコールグラフを作成しました。エージェント実行コマンドで`callGraph.dot`が`build`直下に作成されます。画像の生成にはさらにコマンドを実行してください。
+
+*実行方法*
+```
+java -javaagent:build/libs/tracer-all.jar -cp classpath class
+```
+
+*PNG*
+```
+dot -Tpng -o path build/callGraph.dot
+```
+*SVG*
+```
+dot -Tsvg -o path build/callGraph.dot
+```
